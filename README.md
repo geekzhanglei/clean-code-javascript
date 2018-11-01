@@ -1,30 +1,32 @@
 # 代码整洁的 JavaScript
 
+[原文传送门](https://github.com/ryanmcdermott/clean-code-javascript)
+
 ## 目录
 
-  1. [简介](#简介)
-  2. [变量](#变量)
-  3. [函数](#函数)
-  4. [对象和数据结构](#对象和数据结构)
-  5. [类](#类)
-  6. [SOLID](#solid)
-  7. [测试](#测试)
-  8. [并发](#并发)
-  9. [错误处理](#错误处理)
-  10. [格式化](#格式化)
-  11. [评论](#评论)
-  12. [Translation](#translation)
+1. [简介](#简介)
+2. [变量](#变量)
+3. [函数](#函数)
+4. [对象和数据结构](#对象和数据结构)
+5. [类](#类)
+6. [SOLID](#solid)
+7. [测试](#测试)
+8. [并发](#并发)
+9. [错误处理](#错误处理)
+10. [格式化](#格式化)
+11. [评论](#评论)
+12. [Translation](#translation)
 
 ## 简介
 
 ![一张用你阅读代码时吐槽的数量来评估软件质量的搞笑图片](http://www.osnews.com/images/comics/wtfm.jpg)
 
-将源自 Robert C. Martin 的 [*Clean Code*](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
+将源自 Robert C. Martin 的 [_Clean Code_](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
 的软件工程原则适配到 JavaScript 。 这不是一个代码风格指南， 它是一个使用 JavaScript 来生产
 可读的， 可重用的， 以及可重构的软件的指南。
 
 这里的每一项原则都不是必须遵守的， 甚至只有更少的能够被广泛认可。 这些仅仅是指南而已， 但是却是
-*Clean Code* 作者多年经验的结晶。
+_Clean Code_ 作者多年经验的结晶。
 
 我们的软件工程行业只有短短的 50 年， 依然有很多要我们去学习。 当软件架构与建筑架构一样古老时，
 也许我们将会有硬性的规则去遵守。 而现在， 让这些指南做为你和你的团队生产的 JavaScript 代码的
@@ -40,19 +42,23 @@
 ### 使用有意义并且可读的变量名称
 
 **不好的：**
+
 ```javascript
 const yyyymmdstr = moment().format('YYYY/MM/DD');
 ```
 
 **好的：**
+
 ```javascript
 const currentDate = moment().format('YYYY/MM/DD');
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 为相同类型的变量使用相同的词汇
 
 **不好的：**
+
 ```javascript
 getUserInfo();
 getClientData();
@@ -60,9 +66,11 @@ getCustomerRecord();
 ```
 
 **好的：**
+
 ```javascript
 getUser();
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 使用可搜索的名称
@@ -73,119 +81,135 @@ getUser();
 的工具可以帮助我们找到未命名的常量。
 
 **不好的：**
+
 ```javascript
 // 艹， 86400000 是什么鬼？
 setTimeout(blastOff, 86400000);
-
 ```
 
 **好的：**
+
 ```javascript
 // 将它们声明为全局常量 `const` 。
 const MILLISECONDS_IN_A_DAY = 86400000;
 
 setTimeout(blastOff, MILLISECONDS_IN_A_DAY);
-
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 使用解释性的变量
+
 **不好的：**
+
 ```javascript
 const address = 'One Infinite Loop, Cupertino 95014';
 const cityZipCodeRegex = /^[^,\\]+[,\\\s]+(.+?)\s*(\d{5})?$/;
-saveCityZipCode(address.match(cityZipCodeRegex)[1], address.match(cityZipCodeRegex)[2]);
+saveCityZipCode(
+    address.match(cityZipCodeRegex)[1],
+    address.match(cityZipCodeRegex)[2]
+);
 ```
 
 **好的：**
+
 ```javascript
 const address = 'One Infinite Loop, Cupertino 95014';
 const cityZipCodeRegex = /^[^,\\]+[,\\\s]+(.+?)\s*(\d{5})?$/;
 const [, city, zipCode] = address.match(cityZipCodeRegex) || [];
 saveCityZipCode(city, zipCode);
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
-### 避免心理映射
-显示比隐式更好
+### 避免心理映射(直译的，应该是避免想当然式命名)
+
+显式比隐式更好
 
 **不好的：**
+
 ```javascript
 const locations = ['Austin', 'New York', 'San Francisco'];
-locations.forEach((l) => {
-  doStuff();
-  doSomeOtherStuff();
-  // ...
-  // ...
-  // ...
-  // 等等， `l` 是啥？
-  dispatch(l);
+locations.forEach(l => {
+    doStuff();
+    doSomeOtherStuff();
+    // ...
+    // ...
+    // ...
+    // 等等， `l` 是啥？
+    dispatch(l);
 });
 ```
 
 **好的：**
+
 ```javascript
 const locations = ['Austin', 'New York', 'San Francisco'];
-locations.forEach((location) => {
-  doStuff();
-  doSomeOtherStuff();
-  // ...
-  // ...
-  // ...
-  dispatch(location);
+locations.forEach(location => {
+    doStuff();
+    doSomeOtherStuff();
+    // ...
+    // ...
+    // ...
+    dispatch(location);
 });
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
-### 不添加不必要的上下文
+### 不添加不必要的冗余词缀
 
 如果你的类名/对象名有意义， 不要在变量名上再重复。
 
 **不好的：**
+
 ```javascript
 const Car = {
-  carMake: 'Honda',
-  carModel: 'Accord',
-  carColor: 'Blue'
+    carMake: 'Honda',
+    carModel: 'Accord',
+    carColor: 'Blue'
 };
 
 function paintCar(car) {
-  car.carColor = 'Red';
+    car.carColor = 'Red';
 }
 ```
 
 **好的：**
+
 ```javascript
 const Car = {
-  make: 'Honda',
-  model: 'Accord',
-  color: 'Blue'
+    make: 'Honda',
+    model: 'Accord',
+    color: 'Blue'
 };
 
 function paintCar(car) {
-  car.color = 'Red';
+    car.color = 'Red';
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 使用默认变量替代短路运算或条件
 
 **不好的：**
+
 ```javascript
 function createMicrobrewery(name) {
-  const breweryName = name || 'Hipster Brew Co.';
-  // ...
+    const breweryName = name || 'Hipster Brew Co.';
+    // ...
 }
-
 ```
 
 **好的：**
+
 ```javascript
 function createMicrobrewery(breweryName = 'Hipster Brew Co.') {
-  // ...
+    // ...
 }
-
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ## **函数**
@@ -203,28 +227,29 @@ function createMicrobrewery(breweryName = 'Hipster Brew Co.') {
 可以使用一个对象。
 
 **不好的：**
+
 ```javascript
 function createMenu(title, body, buttonText, cancellable) {
-  // ...
+    // ...
 }
 ```
 
 **好的：**
+
 ```javascript
 const menuConfig = {
-  title: 'Foo',
-  body: 'Bar',
-  buttonText: 'Baz',
-  cancellable: true
+    title: 'Foo',
+    body: 'Bar',
+    buttonText: 'Baz',
+    cancellable: true
 };
 
 function createMenu(config) {
-  // ...
+    // ...
 }
-
 ```
-**[⬆ 返回顶部](#代码整洁的-javascript)**
 
+**[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 函数应当只做一件事情
 
@@ -233,38 +258,40 @@ function createMenu(config) {
 果你严格遵守本指南中的这一条， 你将会领先于许多开发者。
 
 **不好的：**
+
 ```javascript
 function emailClients(clients) {
-  clients.forEach((client) => {
-    const clientRecord = database.lookup(client);
-    if (clientRecord.isActive()) {
-      email(client);
-    }
-  });
+    clients.forEach(client => {
+        const clientRecord = database.lookup(client);
+        if (clientRecord.isActive()) {
+            email(client);
+        }
+    });
 }
 ```
 
 **好的：**
+
 ```javascript
 function emailClients(clients) {
-  clients
-    .filter(isClientActive)
-    .forEach(email);
+    clients.filter(isClientActive).forEach(email);
 }
 
 function isClientActive(client) {
-  const clientRecord = database.lookup(client);
-  return clientRecord.isActive();
+    const clientRecord = database.lookup(client);
+    return clientRecord.isActive();
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 函数名称应该说明它要做什么
 
 **不好的：**
+
 ```javascript
 function addToDate(date, month) {
-  // ...
+    // ...
 }
 
 const date = new Date();
@@ -274,14 +301,16 @@ addToDate(date, 1);
 ```
 
 **好的：**
+
 ```javascript
 function addMonthToDate(month, date) {
-  // ...
+    // ...
 }
 
 const date = new Date();
 addMonthToDate(1, date);
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 函数应该只有一个抽象级别
@@ -289,66 +318,69 @@ addMonthToDate(1, date);
 当在你的函数中有多于一个抽象级别时， 你的函数通常做了太多事情。 拆分函数将会提升重用性和测试性。
 
 **不好的：**
+
 ```javascript
 function parseBetterJSAlternative(code) {
-  const REGEXES = [
-    // ...
-  ];
+    const REGEXES = [
+        // ...
+    ];
 
-  const statements = code.split(' ');
-  const tokens = [];
-  REGEXES.forEach((REGEX) => {
-    statements.forEach((statement) => {
-      // ...
+    const statements = code.split(' ');
+    const tokens = [];
+    REGEXES.forEach(REGEX => {
+        statements.forEach(statement => {
+            // ...
+        });
     });
-  });
 
-  const ast = [];
-  tokens.forEach((token) => {
-    // lex...
-  });
+    const ast = [];
+    tokens.forEach(token => {
+        // lex...
+    });
 
-  ast.forEach((node) => {
-    // parse...
-  });
+    ast.forEach(node => {
+        // parse...
+    });
 }
 ```
 
 **好的：**
+
 ```javascript
 function tokenize(code) {
-  const REGEXES = [
-    // ...
-  ];
+    const REGEXES = [
+        // ...
+    ];
 
-  const statements = code.split(' ');
-  const tokens = [];
-  REGEXES.forEach((REGEX) => {
-    statements.forEach((statement) => {
-      tokens.push( /* ... */ );
+    const statements = code.split(' ');
+    const tokens = [];
+    REGEXES.forEach(REGEX => {
+        statements.forEach(statement => {
+            tokens.push(/* ... */);
+        });
     });
-  });
 
-  return tokens;
+    return tokens;
 }
 
 function lexer(tokens) {
-  const ast = [];
-  tokens.forEach((token) => {
-    ast.push( /* ... */ );
-  });
+    const ast = [];
+    tokens.forEach(token => {
+        ast.push(/* ... */);
+    });
 
-  return ast;
+    return ast;
 }
 
 function parseBetterJSAlternative(code) {
-  const tokens = tokenize(code);
-  const ast = lexer(tokens);
-  ast.forEach((node) => {
-    // parse...
-  });
+    const tokens = tokenize(code);
+    const ast = lexer(tokens);
+    ast.forEach(node => {
+        // parse...
+    });
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 移除冗余代码
@@ -364,114 +396,123 @@ function parseBetterJSAlternative(code) {
 用两个或更多独立的函数来处理大部分相同的东西。 移除冗余代码意味着创建一个可以处理这些不同之处的
 抽象的函数/模块/类。
 
-让这个抽象正确是关键的， 这是为什么要你遵循 *Classes* 那一章的 SOLID 的原因。 不好的抽象比冗
+让这个抽象正确是关键的， 这是为什么要你遵循 _Classes_ 那一章的 SOLID 的原因。 不好的抽象比冗
 余代码更差， 所以要谨慎行事。 既然已经这么说了， 如果你能够做出一个好的抽象， 才去做。 不要重复
 你自己， 否则你会发现当你要修改一个东西时时刻需要修改多个地方。
 
 **不好的：**
+
 ```javascript
 function showDeveloperList(developers) {
-  developers.forEach((developer) => {
-    const expectedSalary = developer.calculateExpectedSalary();
-    const experience = developer.getExperience();
-    const githubLink = developer.getGithubLink();
-    const data = {
-      expectedSalary,
-      experience,
-      githubLink
-    };
+    developers.forEach(developer => {
+        const expectedSalary = developer.calculateExpectedSalary();
+        const experience = developer.getExperience();
+        const githubLink = developer.getGithubLink();
+        const data = {
+            expectedSalary,
+            experience,
+            githubLink
+        };
 
-    render(data);
-  });
+        render(data);
+    });
 }
 
 function showManagerList(managers) {
-  managers.forEach((manager) => {
-    const expectedSalary = manager.calculateExpectedSalary();
-    const experience = manager.getExperience();
-    const portfolio = manager.getMBAProjects();
-    const data = {
-      expectedSalary,
-      experience,
-      portfolio
-    };
+    managers.forEach(manager => {
+        const expectedSalary = manager.calculateExpectedSalary();
+        const experience = manager.getExperience();
+        const portfolio = manager.getMBAProjects();
+        const data = {
+            expectedSalary,
+            experience,
+            portfolio
+        };
 
-    render(data);
-  });
+        render(data);
+    });
 }
 ```
 
 **好的：**
+
 ```javascript
 function showList(employees) {
-  employees.forEach((employee) => {
-    const expectedSalary = employee.calculateExpectedSalary();
-    const experience = employee.getExperience();
+    employees.forEach(employee => {
+        const expectedSalary = employee.calculateExpectedSalary();
+        const experience = employee.getExperience();
 
-    let portfolio = employee.getGithubLink();
+        let portfolio = employee.getGithubLink();
 
-    if (employee.type === 'manager') {
-      portfolio = employee.getMBAProjects();
-    }
+        if (employee.type === 'manager') {
+            portfolio = employee.getMBAProjects();
+        }
 
-    const data = {
-      expectedSalary,
-      experience,
-      portfolio
-    };
+        const data = {
+            expectedSalary,
+            experience,
+            portfolio
+        };
 
-    render(data);
-  });
+        render(data);
+    });
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 使用 Object.assign 设置默认对象
 
 **不好的：**
+
 ```javascript
 const menuConfig = {
-  title: null,
-  body: 'Bar',
-  buttonText: null,
-  cancellable: true
+    title: null,
+    body: 'Bar',
+    buttonText: null,
+    cancellable: true
 };
 
 function createMenu(config) {
-  config.title = config.title || 'Foo';
-  config.body = config.body || 'Bar';
-  config.buttonText = config.buttonText || 'Baz';
-  config.cancellable = config.cancellable === undefined ? config.cancellable : true;
+    config.title = config.title || 'Foo';
+    config.body = config.body || 'Bar';
+    config.buttonText = config.buttonText || 'Baz';
+    config.cancellable =
+        config.cancellable === undefined ? config.cancellable : true;
 }
 
 createMenu(menuConfig);
 ```
 
 **好的：**
+
 ```javascript
 const menuConfig = {
-  title: 'Order',
-  // User did not include 'body' key
-  buttonText: 'Send',
-  cancellable: true
+    title: 'Order',
+    // User did not include 'body' key
+    buttonText: 'Send',
+    cancellable: true
 };
 
 function createMenu(config) {
-  config = Object.assign({
-    title: 'Foo',
-    body: 'Bar',
-    buttonText: 'Baz',
-    cancellable: true
-  }, config);
+    config = Object.assign(
+        {
+            title: 'Foo',
+            body: 'Bar',
+            buttonText: 'Baz',
+            cancellable: true
+        },
+        config
+    );
 
-  // config now equals: {title: "Order", body: "Bar", buttonText: "Send", cancellable: true}
-  // ...
+    // config now equals: {title: "Order", body: "Bar", buttonText: "Send", cancellable: true}
+    // ...
 }
 
 createMenu(menuConfig);
 ```
-**[⬆ 返回顶部](#代码整洁的-javascript)**
 
+**[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 不要使用标记位做为函数参数
 
@@ -479,26 +520,29 @@ createMenu(menuConfig);
 出现不同的代码路径， 请拆分它们。
 
 **不好的：**
+
 ```javascript
 function createFile(name, temp) {
-  if (temp) {
-    fs.create(`./temp/${name}`);
-  } else {
-    fs.create(name);
-  }
+    if (temp) {
+        fs.create(`./temp/${name}`);
+    } else {
+        fs.create(name);
+    }
 }
 ```
 
 **好的：**
+
 ```javascript
 function createFile(name) {
-  fs.create(name);
+    fs.create(name);
 }
 
 function createTempFile(name) {
-  createFile(`./temp/${name}`);
+    createFile(`./temp/${name}`);
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 避免副作用
@@ -514,6 +558,7 @@ function createTempFile(name) {
 的可变的数据类型， 没有集中化导致副作用。 如果你能做到这些， 那么你将会比其它的码农大军更加幸福。
 
 **不好的：**
+
 ```javascript
 // Global variable referenced by following function.
 // 全局变量被下面的函数引用
@@ -523,7 +568,7 @@ function createTempFile(name) {
 let name = 'Ryan McDermott';
 
 function splitIntoFirstAndLastName() {
-  name = name.split(' ');
+    name = name.split(' ');
 }
 
 splitIntoFirstAndLastName();
@@ -532,9 +577,10 @@ console.log(name); // ['Ryan', 'McDermott'];
 ```
 
 **好的：**
+
 ```javascript
 function splitIntoFirstAndLastName(name) {
-  return name.split(' ');
+    return name.split(' ');
 }
 
 const name = 'Ryan McDermott';
@@ -543,6 +589,7 @@ const newName = splitIntoFirstAndLastName(name);
 console.log(name); // 'Ryan McDermott';
 console.log(newName); // ['Ryan', 'McDermott'];
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 不要写入全局函数
@@ -555,22 +602,25 @@ JavaScript 的 原生 `Array` ， 添加一个可以显示两个数组的不同�
 为什么使用 ES2015/ES6 的类是一个更好的做法的原因， 只要简单的扩展全局的 `Array` 即可。
 
 **不好的：**
+
 ```javascript
 Array.prototype.diff = function diff(comparisonArray) {
-  const hash = new Set(comparisonArray);
-  return this.filter(elem => !hash.has(elem));
+    const hash = new Set(comparisonArray);
+    return this.filter(elem => !hash.has(elem));
 };
 ```
 
 **好的：**
+
 ```javascript
 class SuperArray extends Array {
-  diff(comparisonArray) {
-    const hash = new Set(comparisonArray);
-    return this.filter(elem => !hash.has(elem));
-  }
+    diff(comparisonArray) {
+        const hash = new Set(comparisonArray);
+        return this.filter(elem => !hash.has(elem));
+    }
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 函数式编程优于指令式编程
@@ -579,98 +629,113 @@ JavaScript 不是 Haskell 那种方式的函数式语言， 但是它有它的�
 并且更容易进行测试， 当你可以使用函数式编程风格时请尽情使用。
 
 **不好的：**
+
 ```javascript
 const programmerOutput = [
-  {
-    name: 'Uncle Bobby',
-    linesOfCode: 500
-  }, {
-    name: 'Suzie Q',
-    linesOfCode: 1500
-  }, {
-    name: 'Jimmy Gosling',
-    linesOfCode: 150
-  }, {
-    name: 'Gracie Hopper',
-    linesOfCode: 1000
-  }
+    {
+        name: 'Uncle Bobby',
+        linesOfCode: 500
+    },
+    {
+        name: 'Suzie Q',
+        linesOfCode: 1500
+    },
+    {
+        name: 'Jimmy Gosling',
+        linesOfCode: 150
+    },
+    {
+        name: 'Gracie Hopper',
+        linesOfCode: 1000
+    }
 ];
 
 let totalOutput = 0;
 
 for (let i = 0; i < programmerOutput.length; i++) {
-  totalOutput += programmerOutput[i].linesOfCode;
+    totalOutput += programmerOutput[i].linesOfCode;
 }
 ```
 
 **好的：**
+
 ```javascript
 const programmerOutput = [
-  {
-    name: 'Uncle Bobby',
-    linesOfCode: 500
-  }, {
-    name: 'Suzie Q',
-    linesOfCode: 1500
-  }, {
-    name: 'Jimmy Gosling',
-    linesOfCode: 150
-  }, {
-    name: 'Gracie Hopper',
-    linesOfCode: 1000
-  }
+    {
+        name: 'Uncle Bobby',
+        linesOfCode: 500
+    },
+    {
+        name: 'Suzie Q',
+        linesOfCode: 1500
+    },
+    {
+        name: 'Jimmy Gosling',
+        linesOfCode: 150
+    },
+    {
+        name: 'Gracie Hopper',
+        linesOfCode: 1000
+    }
 ];
 
 const totalOutput = programmerOutput
-  .map((programmer) => programmer.linesOfCode)
-  .reduce((acc, linesOfCode) => acc + linesOfCode, 0);
+    .map(programmer => programmer.linesOfCode)
+    .reduce((acc, linesOfCode) => acc + linesOfCode, 0);
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 封装条件语句
 
 **不好的：**
+
 ```javascript
 if (fsm.state === 'fetching' && isEmpty(listNode)) {
-  // ...
+    // ...
 }
 ```
 
 **好的：**
+
 ```javascript
 function shouldShowSpinner(fsm, listNode) {
-  return fsm.state === 'fetching' && isEmpty(listNode);
+    return fsm.state === 'fetching' && isEmpty(listNode);
 }
 
 if (shouldShowSpinner(fsmInstance, listNodeInstance)) {
-  // ...
+    // ...
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 避免负面条件
 
 **不好的：**
+
 ```javascript
 function isDOMNodeNotPresent(node) {
-  // ...
+    // ...
 }
 
 if (!isDOMNodeNotPresent(node)) {
-  // ...
+    // ...
 }
 ```
 
 **好的：**
+
 ```javascript
 function isDOMNodePresent(node) {
-  // ...
+    // ...
 }
 
 if (isDOMNodePresent(node)) {
-  // ...
+    // ...
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 避免条件语句
@@ -682,49 +747,52 @@ if (isDOMNodePresent(node)) {
 事情。
 
 **不好的：**
+
 ```javascript
 class Airplane {
-  // ...
-  getCruisingAltitude() {
-    switch (this.type) {
-      case '777':
-        return this.getMaxAltitude() - this.getPassengerCount();
-      case 'Air Force One':
-        return this.getMaxAltitude();
-      case 'Cessna':
-        return this.getMaxAltitude() - this.getFuelExpenditure();
+    // ...
+    getCruisingAltitude() {
+        switch (this.type) {
+            case '777':
+                return this.getMaxAltitude() - this.getPassengerCount();
+            case 'Air Force One':
+                return this.getMaxAltitude();
+            case 'Cessna':
+                return this.getMaxAltitude() - this.getFuelExpenditure();
+        }
     }
-  }
 }
 ```
 
 **好的：**
+
 ```javascript
 class Airplane {
-  // ...
+    // ...
 }
 
 class Boeing777 extends Airplane {
-  // ...
-  getCruisingAltitude() {
-    return this.getMaxAltitude() - this.getPassengerCount();
-  }
+    // ...
+    getCruisingAltitude() {
+        return this.getMaxAltitude() - this.getPassengerCount();
+    }
 }
 
 class AirForceOne extends Airplane {
-  // ...
-  getCruisingAltitude() {
-    return this.getMaxAltitude();
-  }
+    // ...
+    getCruisingAltitude() {
+        return this.getMaxAltitude();
+    }
 }
 
 class Cessna extends Airplane {
-  // ...
-  getCruisingAltitude() {
-    return this.getMaxAltitude() - this.getFuelExpenditure();
-  }
+    // ...
+    getCruisingAltitude() {
+        return this.getMaxAltitude() - this.getFuelExpenditure();
+    }
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 避免类型检查 (part 1)
@@ -733,22 +801,25 @@ JavaScript 是无类型的， 这意味着你的函数能接受任何类型的�
 于是又尝试在你的函数中做类型检查。 有很多种方式来避免这个， 第一个要考虑的是一致的 API 。
 
 **不好的：**
+
 ```javascript
 function travelToTexas(vehicle) {
-  if (vehicle instanceof Bicycle) {
-    vehicle.peddle(this.currentLocation, new Location('texas'));
-  } else if (vehicle instanceof Car) {
-    vehicle.drive(this.currentLocation, new Location('texas'));
-  }
+    if (vehicle instanceof Bicycle) {
+        vehicle.peddle(this.currentLocation, new Location('texas'));
+    } else if (vehicle instanceof Car) {
+        vehicle.drive(this.currentLocation, new Location('texas'));
+    }
 }
 ```
 
 **好的：**
+
 ```javascript
 function travelToTexas(vehicle) {
-  vehicle.move(this.currentLocation, new Location('texas'));
+    vehicle.move(this.currentLocation, new Location('texas'));
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 避免类型检查 (part 2)
@@ -760,23 +831,28 @@ function travelToTexas(vehicle) {
 TypeScript （就像我说的， 它是一个伟大的替代品）来完成这些。
 
 **不好的：**
+
 ```javascript
 function combine(val1, val2) {
-  if (typeof val1 === 'number' && typeof val2 === 'number' ||
-      typeof val1 === 'string' && typeof val2 === 'string') {
-    return val1 + val2;
-  }
+    if (
+        (typeof val1 === 'number' && typeof val2 === 'number') ||
+        (typeof val1 === 'string' && typeof val2 === 'string')
+    ) {
+        return val1 + val2;
+    }
 
-  throw new Error('Must be of type String or Number');
+    throw new Error('Must be of type String or Number');
 }
 ```
 
 **好的：**
+
 ```javascript
 function combine(val1, val2) {
-  return val1 + val2;
+    return val1 + val2;
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 不要过度优化
@@ -786,23 +862,25 @@ function combine(val1, val2) {
 查看那些地方需要优化。 为这些而优化， 直到他们被修正。
 
 **不好的：**
-```javascript
 
+```javascript
 // On old browsers, each iteration with uncached `list.length` would be costly
 // because of `list.length` recomputation. In modern browsers, this is optimized.
 // 在旧的浏览器上， 每次循环 `list.length` 都没有被缓存， 会导致不必要的开销， 因为要重新计
 // 算 `list.length` 。 在现代化浏览器上， 这个已经被优化了。
 for (let i = 0, len = list.length; i < len; i++) {
-  // ...
+    // ...
 }
 ```
 
 **好的：**
+
 ```javascript
 for (let i = 0; i < list.length; i++) {
-  // ...
+    // ...
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 移除僵尸代码
@@ -811,29 +889,31 @@ for (let i = 0; i < list.length; i++) {
 它时， 它依然保存在版本历史记录中。
 
 **不好的：**
+
 ```javascript
 function oldRequestModule(url) {
-  // ...
+    // ...
 }
 
 function newRequestModule(url) {
-  // ...
+    // ...
 }
 
 const req = newRequestModule;
 inventoryTracker('apples', req, 'www.inventory-awesome.io');
-
 ```
 
 **好的：**
+
 ```javascript
 function newRequestModule(url) {
-  // ...
+    // ...
 }
 
 const req = newRequestModule;
 inventoryTracker('apples', req, 'www.inventory-awesome.io');
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ## **对象和数据结构**
@@ -844,19 +924,20 @@ JavaScript 没有接口或类型， 所以坚持这个模式是非常困难的�
 关键字。 正因为如此， 使用 getters 和 setters 来访问对象上的数据比简单的在一个对象上查找属性
 要好得多。 “为什么？” 你可能会问， 好吧， 原因请看下面的列表：
 
-* 当你想在获取一个对象属性的背后做更多的事情时， 你不需要在代码库中查找和修改每一处访问；
-* 使用 `set` 可以让添加验证变得容易；
-* 封装内部实现；
-* 使用 getting 和 setting 时， 容易添加日志和错误处理；
-* 继承这个类， 你可以重写默认功能；
-* 你可以延迟加载对象的属性， 比如说从服务器获取。
+-   当你想在获取一个对象属性的背后做更多的事情时， 你不需要在代码库中查找和修改每一处访问；
+-   使用 `set` 可以让添加验证变得容易；
+-   封装内部实现；
+-   使用 getting 和 setting 时， 容易添加日志和错误处理；
+-   继承这个类， 你可以重写默认功能；
+-   你可以延迟加载对象的属性， 比如说从服务器获取。
 
 **不好的：**
+
 ```javascript
 class BankAccount {
-  constructor() {
-    this.balance = 1000;
-  }
+    constructor() {
+        this.balance = 1000;
+    }
 }
 
 const bankAccount = new BankAccount();
@@ -866,26 +947,27 @@ bankAccount.balance -= 100;
 ```
 
 **好的：**
+
 ```javascript
 class BankAccount {
-  constructor(balance = 1000) {
-    this._balance = balance;
-  }
-
-  // It doesn't have to be prefixed with `get` or `set` to be a getter/setter
-  set balance(amount) {
-    if (verifyIfAmountCanBeSetted(amount)) {
-      this._balance = amount;
+    constructor(balance = 1000) {
+        this._balance = balance;
     }
-  }
 
-  get balance() {
-    return this._balance;
-  }
+    // It doesn't have to be prefixed with `get` or `set` to be a getter/setter
+    set balance(amount) {
+        if (verifyIfAmountCanBeSetted(amount)) {
+            this._balance = amount;
+        }
+    }
 
-  verifyIfAmountCanBeSetted(val) {
-    // ...
-  }
+    get balance() {
+        return this._balance;
+    }
+
+    verifyIfAmountCanBeSetted(val) {
+        // ...
+    }
 }
 
 const bankAccount = new BankAccount();
@@ -895,23 +977,23 @@ bankAccount.balance -= shoesPrice;
 
 // Get balance
 let balance = bankAccount.balance;
-
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
-
 ### 让对象拥有私有成员
+
 这个可以通过闭包来实现（针对 ES5 或更低）。
 
 **不好的：**
-```javascript
 
+```javascript
 const Employee = function(name) {
-  this.name = name;
+    this.name = name;
 };
 
 Employee.prototype.getName = function getName() {
-  return this.name;
+    return this.name;
 };
 
 const employee = new Employee('John Doe');
@@ -921,11 +1003,12 @@ console.log(`Employee name: ${employee.getName()}`); // Employee name: undefined
 ```
 
 **好的：**
+
 ```javascript
-const Employee = function (name) {
-  this.getName = function getName() {
-    return name;
-  };
+const Employee = function(name) {
+    this.getName = function getName() {
+        return name;
+    };
 };
 
 const employee = new Employee('John Doe');
@@ -933,36 +1016,37 @@ console.log(`Employee name: ${employee.getName()}`); // Employee name: John Doe
 delete employee.name;
 console.log(`Employee name: ${employee.getName()}`); // Employee name: John Doe
 ```
-**[⬆ 返回顶部](#代码整洁的-javascript)**
 
+**[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ## **类**
 
 ### ES2015/ES6 类优先与 ES5 纯函数
 
 很难为经典的 ES5 类创建可读的的继承、 构造和方法定义。 如果你需要继承（并且感到奇怪为啥你不需
-要）， 则优先用 ES2015/ES6的类。 不过， 短小的函数优先于类， 知道你发现你需要更大并且更复杂的
+要）， 则优先用 ES2015/ES6 的类。 不过， 短小的函数优先于类， 知道你发现你需要更大并且更复杂的
 对象。
 
 **不好的：**
+
 ```javascript
 const Animal = function(age) {
-  if (!(this instanceof Animal)) {
-    throw new Error('Instantiate Animal with `new`');
-  }
+    if (!(this instanceof Animal)) {
+        throw new Error('Instantiate Animal with `new`');
+    }
 
-  this.age = age;
+    this.age = age;
 };
 
 Animal.prototype.move = function move() {};
 
 const Mammal = function(age, furColor) {
-  if (!(this instanceof Mammal)) {
-    throw new Error('Instantiate Mammal with `new`');
-  }
+    if (!(this instanceof Mammal)) {
+        throw new Error('Instantiate Mammal with `new`');
+    }
 
-  Animal.call(this, age);
-  this.furColor = furColor;
+    Animal.call(this, age);
+    this.furColor = furColor;
 };
 
 Mammal.prototype = Object.create(Animal.prototype);
@@ -970,12 +1054,12 @@ Mammal.prototype.constructor = Mammal;
 Mammal.prototype.liveBirth = function liveBirth() {};
 
 const Human = function(age, furColor, languageSpoken) {
-  if (!(this instanceof Human)) {
-    throw new Error('Instantiate Human with `new`');
-  }
+    if (!(this instanceof Human)) {
+        throw new Error('Instantiate Human with `new`');
+    }
 
-  Mammal.call(this, age, furColor);
-  this.languageSpoken = languageSpoken;
+    Mammal.call(this, age, furColor);
+    this.languageSpoken = languageSpoken;
 };
 
 Human.prototype = Object.create(Mammal.prototype);
@@ -984,33 +1068,41 @@ Human.prototype.speak = function speak() {};
 ```
 
 **好的**
+
 ```javascript
 class Animal {
-  constructor(age) {
-    this.age = age;
-  }
+    constructor(age) {
+        this.age = age;
+    }
 
-  move() { /* ... */ }
+    move() {
+        /* ... */
+    }
 }
 
 class Mammal extends Animal {
-  constructor(age, furColor) {
-    super(age);
-    this.furColor = furColor;
-  }
+    constructor(age, furColor) {
+        super(age);
+        this.furColor = furColor;
+    }
 
-  liveBirth() { /* ... */ }
+    liveBirth() {
+        /* ... */
+    }
 }
 
 class Human extends Mammal {
-  constructor(age, furColor, languageSpoken) {
-    super(age, furColor);
-    this.languageSpoken = languageSpoken;
-  }
+    constructor(age, furColor, languageSpoken) {
+        super(age, furColor);
+        this.languageSpoken = languageSpoken;
+    }
 
-  speak() { /* ... */ }
+    speak() {
+        /* ... */
+    }
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 使用方法链
@@ -1021,29 +1113,30 @@ class Human extends Mammal {
 其它方法链在一起。
 
 **不好的：**
+
 ```javascript
 class Car {
-  constructor() {
-    this.make = 'Honda';
-    this.model = 'Accord';
-    this.color = 'white';
-  }
+    constructor() {
+        this.make = 'Honda';
+        this.model = 'Accord';
+        this.color = 'white';
+    }
 
-  setMake(make) {
-    this.make = make;
-  }
+    setMake(make) {
+        this.make = make;
+    }
 
-  setModel(model) {
-    this.model = model;
-  }
+    setModel(model) {
+        this.model = model;
+    }
 
-  setColor(color) {
-    this.color = color;
-  }
+    setColor(color) {
+        this.color = color;
+    }
 
-  save() {
-    console.log(this.make, this.model, this.color);
-  }
+    save() {
+        console.log(this.make, this.model, this.color);
+    }
 }
 
 const car = new Car();
@@ -1054,50 +1147,52 @@ car.save();
 ```
 
 **好的：**
+
 ```javascript
 class Car {
-  constructor() {
-    this.make = 'Honda';
-    this.model = 'Accord';
-    this.color = 'white';
-  }
+    constructor() {
+        this.make = 'Honda';
+        this.model = 'Accord';
+        this.color = 'white';
+    }
 
-  setMake(make) {
-    this.make = make;
-    // NOTE: Returning this for chaining
-    return this;
-  }
+    setMake(make) {
+        this.make = make;
+        // NOTE: Returning this for chaining
+        return this;
+    }
 
-  setModel(model) {
-    this.model = model;
-    // NOTE: Returning this for chaining
-    return this;
-  }
+    setModel(model) {
+        this.model = model;
+        // NOTE: Returning this for chaining
+        return this;
+    }
 
-  setColor(color) {
-    this.color = color;
-    // NOTE: Returning this for chaining
-    return this;
-  }
+    setColor(color) {
+        this.color = color;
+        // NOTE: Returning this for chaining
+        return this;
+    }
 
-  save() {
-    console.log(this.make, this.model, this.color);
-    // NOTE: Returning this for chaining
-    return this;
-  }
+    save() {
+        console.log(this.make, this.model, this.color);
+        // NOTE: Returning this for chaining
+        return this;
+    }
 }
 
 const car = new Car()
-  .setColor('pink')
-  .setMake('Ford')
-  .setModel('F-150')
-  .save();
+    .setColor('pink')
+    .setMake('Ford')
+    .setModel('F-150')
+    .save();
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 组合优先于继承
 
-正如[*设计模式四人帮*](https://en.wikipedia.org/wiki/Design_Patterns)所述， 如果可能，
+正如[_设计模式四人帮_](https://en.wikipedia.org/wiki/Design_Patterns)所述， 如果可能，
 你应该优先使用组合而不是继承。 有许多好的理由去使用继承， 也有许多好的理由去使用组合。这个格言
 的重点是， 如果你本能的观点是继承， 那么请想一下组合能否更好的为你的问题建模。 很多情况下它真的
 可以。
@@ -1114,51 +1209,54 @@ makes more sense than composition:
 3. 你想通过基类对子类进行全局的修改（改变所有动物行动时的热量消耗）；
 
 **不好的：**
+
 ```javascript
 class Employee {
-  constructor(name, email) {
-    this.name = name;
-    this.email = email;
-  }
+    constructor(name, email) {
+        this.name = name;
+        this.email = email;
+    }
 
-  // ...
+    // ...
 }
 
 // 不好是因为雇员“有”税率数据， EmployeeTaxData 不是一个 Employee 类型。
 class EmployeeTaxData extends Employee {
-  constructor(ssn, salary) {
-    super();
-    this.ssn = ssn;
-    this.salary = salary;
-  }
+    constructor(ssn, salary) {
+        super();
+        this.ssn = ssn;
+        this.salary = salary;
+    }
 
-  // ...
+    // ...
 }
 ```
 
 **好的：**
+
 ```javascript
 class EmployeeTaxData {
-  constructor(ssn, salary) {
-    this.ssn = ssn;
-    this.salary = salary;
-  }
+    constructor(ssn, salary) {
+        this.ssn = ssn;
+        this.salary = salary;
+    }
 
-  // ...
+    // ...
 }
 
 class Employee {
-  constructor(name, email) {
-    this.name = name;
-    this.email = email;
-  }
+    constructor(name, email) {
+        this.name = name;
+        this.email = email;
+    }
 
-  setTaxData(ssn, salary) {
-    this.taxData = new EmployeeTaxData(ssn, salary);
-  }
-  // ...
+    setTaxData(ssn, salary) {
+        this.taxData = new EmployeeTaxData(ssn, salary);
+    }
+    // ...
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ## **SOLID**
@@ -1171,50 +1269,52 @@ class Employee {
 将会很难弄清楚会对代码库中的其它模块造成什么影响。
 
 **不好的：**
+
 ```javascript
 class UserSettings {
-  constructor(user) {
-    this.user = user;
-  }
-
-  changeSettings(settings) {
-    if (this.verifyCredentials()) {
-      // ...
+    constructor(user) {
+        this.user = user;
     }
-  }
 
-  verifyCredentials() {
-    // ...
-  }
+    changeSettings(settings) {
+        if (this.verifyCredentials()) {
+            // ...
+        }
+    }
+
+    verifyCredentials() {
+        // ...
+    }
 }
 ```
 
 **好的：**
+
 ```javascript
 class UserAuth {
-  constructor(user) {
-    this.user = user;
-  }
+    constructor(user) {
+        this.user = user;
+    }
 
-  verifyCredentials() {
-    // ...
-  }
+    verifyCredentials() {
+        // ...
+    }
 }
-
 
 class UserSettings {
-  constructor(user) {
-    this.user = user;
-    this.auth = new UserAuth(user);
-  }
-
-  changeSettings(settings) {
-    if (this.auth.verifyCredentials()) {
-      // ...
+    constructor(user) {
+        this.user = user;
+        this.auth = new UserAuth(user);
     }
-  }
+
+    changeSettings(settings) {
+        if (this.auth.verifyCredentials()) {
+            // ...
+        }
+    }
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 开闭原则 (OCP)
@@ -1223,84 +1323,87 @@ Bertrand Meyer 说过， “软件实体 (类， 模块， 函数等) 应该为�
 是什么意思呢？ 这个原则基本上说明了你应该允许用户添加功能而不必修改现有的代码。
 
 **不好的：**
+
 ```javascript
 class AjaxAdapter extends Adapter {
-  constructor() {
-    super();
-    this.name = 'ajaxAdapter';
-  }
+    constructor() {
+        super();
+        this.name = 'ajaxAdapter';
+    }
 }
 
 class NodeAdapter extends Adapter {
-  constructor() {
-    super();
-    this.name = 'nodeAdapter';
-  }
+    constructor() {
+        super();
+        this.name = 'nodeAdapter';
+    }
 }
 
 class HttpRequester {
-  constructor(adapter) {
-    this.adapter = adapter;
-  }
-
-  fetch(url) {
-    if (this.adapter.name === 'ajaxAdapter') {
-      return makeAjaxCall(url).then((response) => {
-        // transform response and return
-      });
-    } else if (this.adapter.name === 'httpNodeAdapter') {
-      return makeHttpCall(url).then((response) => {
-        // transform response and return
-      });
+    constructor(adapter) {
+        this.adapter = adapter;
     }
-  }
+
+    fetch(url) {
+        if (this.adapter.name === 'ajaxAdapter') {
+            return makeAjaxCall(url).then(response => {
+                // transform response and return
+            });
+        } else if (this.adapter.name === 'httpNodeAdapter') {
+            return makeHttpCall(url).then(response => {
+                // transform response and return
+            });
+        }
+    }
 }
 
 function makeAjaxCall(url) {
-  // request and return promise
+    // request and return promise
 }
 
 function makeHttpCall(url) {
-  // request and return promise
+    // request and return promise
 }
 ```
 
 **好的：**
+
 ```javascript
 class AjaxAdapter extends Adapter {
-  constructor() {
-    super();
-    this.name = 'ajaxAdapter';
-  }
+    constructor() {
+        super();
+        this.name = 'ajaxAdapter';
+    }
 
-  request(url) {
-    // request and return promise
-  }
+    request(url) {
+        // request and return promise
+    }
 }
 
 class NodeAdapter extends Adapter {
-  constructor() {
-    super();
-    this.name = 'nodeAdapter';
-  }
+    constructor() {
+        super();
+        this.name = 'nodeAdapter';
+    }
 
-  request(url) {
-    // request and return promise
-  }
+    request(url) {
+        // request and return promise
+    }
 }
 
 class HttpRequester {
-  constructor(adapter) {
-    this.adapter = adapter;
-  }
+    constructor(adapter) {
+        this.adapter = adapter;
+    }
 
-  fetch(url) {
-    return this.adapter.request(url).then((response) => {
-      // transform response and return
-    });
-  }
+    fetch(url) {
+        return this.adapter.request(url).then(response => {
+            // transform response and return
+        });
+    }
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 里氏代换原则 (LSP)
@@ -1314,53 +1417,54 @@ class HttpRequester {
 但是你用 "is-a" 的关系用继承来实现， 你将很快遇到麻烦。
 
 **不好的：**
+
 ```javascript
 class Rectangle {
-  constructor() {
-    this.width = 0;
-    this.height = 0;
-  }
+    constructor() {
+        this.width = 0;
+        this.height = 0;
+    }
 
-  setColor(color) {
-    // ...
-  }
+    setColor(color) {
+        // ...
+    }
 
-  render(area) {
-    // ...
-  }
+    render(area) {
+        // ...
+    }
 
-  setWidth(width) {
-    this.width = width;
-  }
+    setWidth(width) {
+        this.width = width;
+    }
 
-  setHeight(height) {
-    this.height = height;
-  }
+    setHeight(height) {
+        this.height = height;
+    }
 
-  getArea() {
-    return this.width * this.height;
-  }
+    getArea() {
+        return this.width * this.height;
+    }
 }
 
 class Square extends Rectangle {
-  setWidth(width) {
-    this.width = width;
-    this.height = width;
-  }
+    setWidth(width) {
+        this.width = width;
+        this.height = width;
+    }
 
-  setHeight(height) {
-    this.width = height;
-    this.height = height;
-  }
+    setHeight(height) {
+        this.width = height;
+        this.height = height;
+    }
 }
 
 function renderLargeRectangles(rectangles) {
-  rectangles.forEach((rectangle) => {
-    rectangle.setWidth(4);
-    rectangle.setHeight(5);
-    const area = rectangle.getArea(); // BAD: Will return 25 for Square. Should be 20.
-    rectangle.render(area);
-  });
+    rectangles.forEach(rectangle => {
+        rectangle.setWidth(4);
+        rectangle.setHeight(5);
+        const area = rectangle.getArea(); // BAD: Will return 25 for Square. Should be 20.
+        rectangle.render(area);
+    });
 }
 
 const rectangles = [new Rectangle(), new Rectangle(), new Square()];
@@ -1368,50 +1472,52 @@ renderLargeRectangles(rectangles);
 ```
 
 **好的：**
+
 ```javascript
 class Shape {
-  setColor(color) {
-    // ...
-  }
+    setColor(color) {
+        // ...
+    }
 
-  render(area) {
-    // ...
-  }
+    render(area) {
+        // ...
+    }
 }
 
 class Rectangle extends Shape {
-  constructor(width, height) {
-    super();
-    this.width = width;
-    this.height = height;
-  }
+    constructor(width, height) {
+        super();
+        this.width = width;
+        this.height = height;
+    }
 
-  getArea() {
-    return this.width * this.height;
-  }
+    getArea() {
+        return this.width * this.height;
+    }
 }
 
 class Square extends Shape {
-  constructor(length) {
-    super();
-    this.length = length;
-  }
+    constructor(length) {
+        super();
+        this.length = length;
+    }
 
-  getArea() {
-    return this.length * this.length;
-  }
+    getArea() {
+        return this.length * this.length;
+    }
 }
 
 function renderLargeShapes(shapes) {
-  shapes.forEach((shape) => {
-    const area = shape.getArea();
-    shape.render(area);
-  });
+    shapes.forEach(shape => {
+        const area = shape.getArea();
+        shape.render(area);
+    });
 }
 
 const shapes = [new Rectangle(4, 5), new Rectangle(4, 5), new Square(5)];
 renderLargeShapes(shapes);
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 接口隔离原则 (ISP)
@@ -1427,63 +1533,65 @@ JavaScript 没有接口， 所以这个原则不想其它语言那么严格。 �
 口”。
 
 **不好的：**
+
 ```javascript
 class DOMTraverser {
-  constructor(settings) {
-    this.settings = settings;
-    this.setup();
-  }
+    constructor(settings) {
+        this.settings = settings;
+        this.setup();
+    }
 
-  setup() {
-    this.rootNode = this.settings.rootNode;
-    this.animationModule.setup();
-  }
+    setup() {
+        this.rootNode = this.settings.rootNode;
+        this.animationModule.setup();
+    }
 
-  traverse() {
-    // ...
-  }
+    traverse() {
+        // ...
+    }
 }
 
 const $ = new DOMTraverser({
-  rootNode: document.getElementsByTagName('body'),
-  animationModule() {} // Most of the time, we won't need to animate when traversing.
-  // ...
+    rootNode: document.getElementsByTagName('body'),
+    animationModule() {} // Most of the time, we won't need to animate when traversing.
+    // ...
 });
-
 ```
 
 **好的：**
+
 ```javascript
 class DOMTraverser {
-  constructor(settings) {
-    this.settings = settings;
-    this.options = settings.options;
-    this.setup();
-  }
-
-  setup() {
-    this.rootNode = this.settings.rootNode;
-    this.setupOptions();
-  }
-
-  setupOptions() {
-    if (this.options.animationModule) {
-      // ...
+    constructor(settings) {
+        this.settings = settings;
+        this.options = settings.options;
+        this.setup();
     }
-  }
 
-  traverse() {
-    // ...
-  }
+    setup() {
+        this.rootNode = this.settings.rootNode;
+        this.setupOptions();
+    }
+
+    setupOptions() {
+        if (this.options.animationModule) {
+            // ...
+        }
+    }
+
+    traverse() {
+        // ...
+    }
 }
 
 const $ = new DOMTraverser({
-  rootNode: document.getElementsByTagName('body'),
-  options: {
-    animationModule() {}
-  }
+    rootNode: document.getElementsByTagName('body'),
+    options: {
+        animationModule() {}
+    }
 });
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 依赖反转原则 (DIP)
@@ -1503,31 +1611,32 @@ const $ = new DOMTraverser({
 将有一个 `requestItems` 方法。
 
 **不好的：**
+
 ```javascript
 class InventoryRequester {
-  constructor() {
-    this.REQ_METHODS = ['HTTP'];
-  }
+    constructor() {
+        this.REQ_METHODS = ['HTTP'];
+    }
 
-  requestItem(item) {
-    // ...
-  }
+    requestItem(item) {
+        // ...
+    }
 }
 
 class InventoryTracker {
-  constructor(items) {
-    this.items = items;
+    constructor(items) {
+        this.items = items;
 
-    // 不好的： 我们已经创建了一个对请求的具体实现的依赖， 我们只有一个 requestItems 方法依
-    // 赖一个请求方法 'request'
-    this.requester = new InventoryRequester();
-  }
+        // 不好的： 我们已经创建了一个对请求的具体实现的依赖， 我们只有一个 requestItems 方法依
+        // 赖一个请求方法 'request'
+        this.requester = new InventoryRequester();
+    }
 
-  requestItems() {
-    this.items.forEach((item) => {
-      this.requester.requestItem(item);
-    });
-  }
+    requestItems() {
+        this.items.forEach(item => {
+            this.requester.requestItem(item);
+        });
+    }
 }
 
 const inventoryTracker = new InventoryTracker(['apples', 'bananas']);
@@ -1535,45 +1644,50 @@ inventoryTracker.requestItems();
 ```
 
 **好的：**
+
 ```javascript
 class InventoryTracker {
-  constructor(items, requester) {
-    this.items = items;
-    this.requester = requester;
-  }
+    constructor(items, requester) {
+        this.items = items;
+        this.requester = requester;
+    }
 
-  requestItems() {
-    this.items.forEach((item) => {
-      this.requester.requestItem(item);
-    });
-  }
+    requestItems() {
+        this.items.forEach(item => {
+            this.requester.requestItem(item);
+        });
+    }
 }
 
 class InventoryRequesterV1 {
-  constructor() {
-    this.REQ_METHODS = ['HTTP'];
-  }
+    constructor() {
+        this.REQ_METHODS = ['HTTP'];
+    }
 
-  requestItem(item) {
-    // ...
-  }
+    requestItem(item) {
+        // ...
+    }
 }
 
 class InventoryRequesterV2 {
-  constructor() {
-    this.REQ_METHODS = ['WS'];
-  }
+    constructor() {
+        this.REQ_METHODS = ['WS'];
+    }
 
-  requestItem(item) {
-    // ...
-  }
+    requestItem(item) {
+        // ...
+    }
 }
 
 // 通过外部创建依赖项并将它们注入， 我们可以轻松的用一个崭新的使用 WebSockets 的请求模块进行
 // 替换。
-const inventoryTracker = new InventoryTracker(['apples', 'bananas'], new InventoryRequesterV2());
+const inventoryTracker = new InventoryTracker(
+    ['apples', 'bananas'],
+    new InventoryRequesterV2()
+);
 inventoryTracker.requestItems();
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ## **测试**
@@ -1590,52 +1704,55 @@ inventoryTracker.requestItems();
 ### 一个测试一个概念
 
 **不好的：**
+
 ```javascript
 const assert = require('assert');
 
 describe('MakeMomentJSGreatAgain', () => {
-  it('handles date boundaries', () => {
-    let date;
+    it('handles date boundaries', () => {
+        let date;
 
-    date = new MakeMomentJSGreatAgain('1/1/2015');
-    date.addDays(30);
-    date.shouldEqual('1/31/2015');
+        date = new MakeMomentJSGreatAgain('1/1/2015');
+        date.addDays(30);
+        date.shouldEqual('1/31/2015');
 
-    date = new MakeMomentJSGreatAgain('2/1/2016');
-    date.addDays(28);
-    assert.equal('02/29/2016', date);
+        date = new MakeMomentJSGreatAgain('2/1/2016');
+        date.addDays(28);
+        assert.equal('02/29/2016', date);
 
-    date = new MakeMomentJSGreatAgain('2/1/2015');
-    date.addDays(28);
-    assert.equal('03/01/2015', date);
-  });
+        date = new MakeMomentJSGreatAgain('2/1/2015');
+        date.addDays(28);
+        assert.equal('03/01/2015', date);
+    });
 });
 ```
 
 **好的：**
+
 ```javascript
 const assert = require('assert');
 
 describe('MakeMomentJSGreatAgain', () => {
-  it('handles 30-day months', () => {
-    const date = new MakeMomentJSGreatAgain('1/1/2015');
-    date.addDays(30);
-    date.shouldEqual('1/31/2015');
-  });
+    it('handles 30-day months', () => {
+        const date = new MakeMomentJSGreatAgain('1/1/2015');
+        date.addDays(30);
+        date.shouldEqual('1/31/2015');
+    });
 
-  it('handles leap year', () => {
-    const date = new MakeMomentJSGreatAgain('2/1/2016');
-    date.addDays(28);
-    assert.equal('02/29/2016', date);
-  });
+    it('handles leap year', () => {
+        const date = new MakeMomentJSGreatAgain('2/1/2016');
+        date.addDays(28);
+        assert.equal('02/29/2016', date);
+    });
 
-  it('handles non-leap year', () => {
-    const date = new MakeMomentJSGreatAgain('2/1/2015');
-    date.addDays(28);
-    assert.equal('03/01/2015', date);
-  });
+    it('handles non-leap year', () => {
+        const date = new MakeMomentJSGreatAgain('2/1/2015');
+        date.addDays(28);
+        assert.equal('03/01/2015', date);
+    });
 });
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ## **并发**
@@ -1646,37 +1763,42 @@ describe('MakeMomentJSGreatAgain', () => {
 了，使用它们吧！
 
 **不好的：**
-```javascript
-require('request').get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin', (requestErr, response) => {
-  if (requestErr) {
-    console.error(requestErr);
-  } else {
-    require('fs').writeFile('article.html', response.body, (writeErr) => {
-      if (writeErr) {
-        console.error(writeErr);
-      } else {
-        console.log('File written');
-      }
-    });
-  }
-});
 
+```javascript
+require('request').get(
+    'https://en.wikipedia.org/wiki/Robert_Cecil_Martin',
+    (requestErr, response) => {
+        if (requestErr) {
+            console.error(requestErr);
+        } else {
+            require('fs').writeFile('article.html', response.body, writeErr => {
+                if (writeErr) {
+                    console.error(writeErr);
+                } else {
+                    console.log('File written');
+                }
+            });
+        }
+    }
+);
 ```
 
 **好的：**
-```javascript
-require('request-promise').get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin')
-  .then((response) => {
-    return require('fs-promise').writeFile('article.html', response);
-  })
-  .then(() => {
-    console.log('File written');
-  })
-  .catch((err) => {
-    console.error(err);
-  });
 
+```javascript
+require('request-promise')
+    .get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin')
+    .then(response => {
+        return require('fs-promise').writeFile('article.html', response);
+    })
+    .then(() => {
+        console.log('File written');
+    })
+    .catch(err => {
+        console.error(err);
+    });
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### Async/Await 比 Promises 更加简洁
@@ -1686,34 +1808,38 @@ Promises 是回调的一个非常简洁的替代品， 但是 ES2017/ES8 带来�
 函数链来编写逻辑了。 如果你能使用 ES2017/ES8 的高级功能的话， 今天就使用它吧！
 
 **不好的：**
-```javascript
-require('request-promise').get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin')
-  .then((response) => {
-    return require('fs-promise').writeFile('article.html', response);
-  })
-  .then(() => {
-    console.log('File written');
-  })
-  .catch((err) => {
-    console.error(err);
-  });
 
+```javascript
+require('request-promise')
+    .get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin')
+    .then(response => {
+        return require('fs-promise').writeFile('article.html', response);
+    })
+    .then(() => {
+        console.log('File written');
+    })
+    .catch(err => {
+        console.error(err);
+    });
 ```
 
 **好的：**
+
 ```javascript
 async function getCleanCodeArticle() {
-  try {
-    const response = await require('request-promise').get('https://en.wikipedia.org/wiki/Robert_Cecil_Martin');
-    await require('fs-promise').writeFile('article.html', response);
-    console.log('File written');
-  } catch(err) {
-    console.error(err);
-  }
+    try {
+        const response = await require('request-promise').get(
+            'https://en.wikipedia.org/wiki/Robert_Cecil_Martin'
+        );
+        await require('fs-promise').writeFile('article.html', response);
+        console.log('File written');
+    } catch (err) {
+        console.error(err);
+    }
 }
 ```
-**[⬆ 返回顶部](#代码整洁的-javascript)**
 
+**[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ## **错误处理**
 
@@ -1727,59 +1853,63 @@ async function getCleanCodeArticle() {
 意味着你想到这里可能会错， 因此你应该有个修复计划， 或者当错误发生时有一个代码路径。
 
 **不好的：**
+
 ```javascript
 try {
-  functionThatMightThrow();
+    functionThatMightThrow();
 } catch (error) {
-  console.log(error);
+    console.log(error);
 }
 ```
 
 **好的：**
+
 ```javascript
 try {
-  functionThatMightThrow();
+    functionThatMightThrow();
 } catch (error) {
-  // One option (more noisy than console.log):
-  console.error(error);
-  // Another option:
-  notifyUserOfError(error);
-  // Another option:
-  reportErrorToService(error);
-  // OR do all three!
+    // One option (more noisy than console.log):
+    console.error(error);
+    // Another option:
+    notifyUserOfError(error);
+    // Another option:
+    reportErrorToService(error);
+    // OR do all three!
 }
 ```
 
-### 不要忽略被拒绝的 promise 
+### 不要忽略被拒绝的 promise
 
 与你不应忽略来自 `try/catch` 的错误的原因相同。
 
 **不好的：**
+
 ```javascript
 getdata()
-.then((data) => {
-  functionThatMightThrow(data);
-})
-.catch((error) => {
-  console.log(error);
-});
+    .then(data => {
+        functionThatMightThrow(data);
+    })
+    .catch(error => {
+        console.log(error);
+    });
 ```
 
 **好的：**
+
 ```javascript
 getdata()
-.then((data) => {
-  functionThatMightThrow(data);
-})
-.catch((error) => {
-  // One option (more noisy than console.log):
-  console.error(error);
-  // Another option:
-  notifyUserOfError(error);
-  // Another option:
-  reportErrorToService(error);
-  // OR do all three!
-});
+    .then(data => {
+        functionThatMightThrow(data);
+    })
+    .catch(error => {
+        // One option (more noisy than console.log):
+        console.error(error);
+        // Another option:
+        notifyUserOfError(error);
+        // Another option:
+        reportErrorToService(error);
+        // OR do all three!
+    });
 ```
 
 **[⬆ 返回顶部](#代码整洁的-javascript)**
@@ -1798,6 +1928,7 @@ JavaScript 是无类型的， 所以大小写告诉你关于你的变量、 函�
 所以你的团队可以选择他们想要的。 重点是， 不管你们选择了什么， 要保持一致。
 
 **不好的：**
+
 ```javascript
 const DAYS_IN_WEEK = 7;
 const daysInMonth = 30;
@@ -1813,6 +1944,7 @@ class Alpaca {}
 ```
 
 **好的：**
+
 ```javascript
 const DAYS_IN_WEEK = 7;
 const DAYS_IN_MONTH = 30;
@@ -1826,8 +1958,8 @@ function restoreDatabase() {}
 class Animal {}
 class Alpaca {}
 ```
-**[⬆ 返回顶部](#代码整洁的-javascript)**
 
+**[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 函数的调用方与被调用方应该靠近
 
@@ -1836,38 +1968,39 @@ class Alpaca {}
 以按照这种方式阅读。
 
 **不好的：**
+
 ```javascript
 class PerformanceReview {
-  constructor(employee) {
-    this.employee = employee;
-  }
+    constructor(employee) {
+        this.employee = employee;
+    }
 
-  lookupPeers() {
-    return db.lookup(this.employee, 'peers');
-  }
+    lookupPeers() {
+        return db.lookup(this.employee, 'peers');
+    }
 
-  lookupManager() {
-    return db.lookup(this.employee, 'manager');
-  }
+    lookupManager() {
+        return db.lookup(this.employee, 'manager');
+    }
 
-  getPeerReviews() {
-    const peers = this.lookupPeers();
-    // ...
-  }
+    getPeerReviews() {
+        const peers = this.lookupPeers();
+        // ...
+    }
 
-  perfReview() {
-    this.getPeerReviews();
-    this.getManagerReview();
-    this.getSelfReview();
-  }
+    perfReview() {
+        this.getPeerReviews();
+        this.getManagerReview();
+        this.getSelfReview();
+    }
 
-  getManagerReview() {
-    const manager = this.lookupManager();
-  }
+    getManagerReview() {
+        const manager = this.lookupManager();
+    }
 
-  getSelfReview() {
-    // ...
-  }
+    getSelfReview() {
+        // ...
+    }
 }
 
 const review = new PerformanceReview(user);
@@ -1875,38 +2008,39 @@ review.perfReview();
 ```
 
 **好的：**
+
 ```javascript
 class PerformanceReview {
-  constructor(employee) {
-    this.employee = employee;
-  }
+    constructor(employee) {
+        this.employee = employee;
+    }
 
-  perfReview() {
-    this.getPeerReviews();
-    this.getManagerReview();
-    this.getSelfReview();
-  }
+    perfReview() {
+        this.getPeerReviews();
+        this.getManagerReview();
+        this.getSelfReview();
+    }
 
-  getPeerReviews() {
-    const peers = this.lookupPeers();
-    // ...
-  }
+    getPeerReviews() {
+        const peers = this.lookupPeers();
+        // ...
+    }
 
-  lookupPeers() {
-    return db.lookup(this.employee, 'peers');
-  }
+    lookupPeers() {
+        return db.lookup(this.employee, 'peers');
+    }
 
-  getManagerReview() {
-    const manager = this.lookupManager();
-  }
+    getManagerReview() {
+        const manager = this.lookupManager();
+    }
 
-  lookupManager() {
-    return db.lookup(this.employee, 'manager');
-  }
+    lookupManager() {
+        return db.lookup(this.employee, 'manager');
+    }
 
-  getSelfReview() {
-    // ...
-  }
+    getSelfReview() {
+        // ...
+    }
 }
 
 const review = new PerformanceReview(employee);
@@ -1922,43 +2056,44 @@ review.perfReview();
 评论是代码的辩解， 不是要求。 多数情况下， 好的代码就是文档。
 
 **不好的：**
+
 ```javascript
 function hashIt(data) {
-  // The hash
-  let hash = 0;
+    // The hash
+    let hash = 0;
 
-  // Length of string
-  const length = data.length;
+    // Length of string
+    const length = data.length;
 
-  // Loop through every character in data
-  for (let i = 0; i < length; i++) {
-    // Get character code.
-    const char = data.charCodeAt(i);
-    // Make the hash
-    hash = ((hash << 5) - hash) + char;
-    // Convert to 32-bit integer
-    hash &= hash;
-  }
+    // Loop through every character in data
+    for (let i = 0; i < length; i++) {
+        // Get character code.
+        const char = data.charCodeAt(i);
+        // Make the hash
+        hash = (hash << 5) - hash + char;
+        // Convert to 32-bit integer
+        hash &= hash;
+    }
 }
 ```
 
 **好的：**
+
 ```javascript
-
 function hashIt(data) {
-  let hash = 0;
-  const length = data.length;
+    let hash = 0;
+    const length = data.length;
 
-  for (let i = 0; i < length; i++) {
-    const char = data.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    for (let i = 0; i < length; i++) {
+        const char = data.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
 
-    // Convert to 32-bit integer
-    hash &= hash;
-  }
+        // Convert to 32-bit integer
+        hash &= hash;
+    }
 }
-
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 不要在代码库中保存注释掉的代码
@@ -1966,6 +2101,7 @@ function hashIt(data) {
 因为有版本控制， 把旧的代码留在历史记录即可。
 
 **不好的：**
+
 ```javascript
 doStuff();
 // doOtherStuff();
@@ -1974,9 +2110,11 @@ doStuff();
 ```
 
 **好的：**
+
 ```javascript
 doStuff();
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 不要有日志式的评论
@@ -1985,6 +2123,7 @@ doStuff();
 获取历史记录。
 
 **不好的：**
+
 ```javascript
 /**
  * 2016-12-20: Removed monads, didn't understand them (RM)
@@ -1993,16 +2132,18 @@ doStuff();
  * 2015-03-14: Added combine with type-checking (JR)
  */
 function combine(a, b) {
-  return a + b;
+    return a + b;
 }
 ```
 
 **好的：**
+
 ```javascript
 function combine(a, b) {
-  return a + b;
+    return a + b;
 }
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ### 避免占位符
@@ -2010,49 +2151,52 @@ function combine(a, b) {
 它们仅仅添加了干扰。 让函数和变量名称与合适的缩进和格式化为你的代码提供视觉结构。
 
 **不好的：**
+
 ```javascript
 ////////////////////////////////////////////////////////////////////////////////
 // Scope Model Instantiation
 ////////////////////////////////////////////////////////////////////////////////
 $scope.model = {
-  menu: 'foo',
-  nav: 'bar'
+    menu: 'foo',
+    nav: 'bar'
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action setup
 ////////////////////////////////////////////////////////////////////////////////
 const actions = function() {
-  // ...
+    // ...
 };
 ```
 
 **好的：**
+
 ```javascript
 $scope.model = {
-  menu: 'foo',
-  nav: 'bar'
+    menu: 'foo',
+    nav: 'bar'
 };
 
 const actions = function() {
-  // ...
+    // ...
 };
 ```
+
 **[⬆ 返回顶部](#代码整洁的-javascript)**
 
 ## Translation
 
 This is also available in other languages:
 
-  - ![br](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Brazil.png) **Brazilian Portuguese**: [fesnt/clean-code-javascript](https://github.com/fesnt/clean-code-javascript)
-  - ![cn](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **Chinese**:
-    - [alivebao/clean-code-js](https://github.com/alivebao/clean-code-js)
-    - [beginor/clean-code-js](https://github.com/beginor/clean-code-javascript/blob/master/README-zh-CN.md)
-  - ![de](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Germany.png) **German**: [marcbruederlin/clean-code-javascript](https://github.com/marcbruederlin/clean-code-javascript)
-  - ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Korean**: [qkraudghgh/clean-code-javascript-ko](https://github.com/qkraudghgh/clean-code-javascript-ko)
-  - ![ru](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Russia.png) **Russian**:
-    - [BoryaMogila/clean-code-javascript-ru/](https://github.com/BoryaMogila/clean-code-javascript-ru/)
-    - [maksugr/clean-code-javascript](https://github.com/maksugr/clean-code-javascript)
-  - ![vi](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Vietnam.png) **Vietnamese**: [hienvd/clean-code-javascript/](https://github.com/hienvd/clean-code-javascript/)
+-   ![br](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Brazil.png) **Brazilian Portuguese**: [fesnt/clean-code-javascript](https://github.com/fesnt/clean-code-javascript)
+-   ![cn](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **Chinese**:
+    -   [alivebao/clean-code-js](https://github.com/alivebao/clean-code-js)
+    -   [beginor/clean-code-js](https://github.com/beginor/clean-code-javascript/blob/master/README-zh-CN.md)
+-   ![de](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Germany.png) **German**: [marcbruederlin/clean-code-javascript](https://github.com/marcbruederlin/clean-code-javascript)
+-   ![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **Korean**: [qkraudghgh/clean-code-javascript-ko](https://github.com/qkraudghgh/clean-code-javascript-ko)
+-   ![ru](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Russia.png) **Russian**:
+    -   [BoryaMogila/clean-code-javascript-ru/](https://github.com/BoryaMogila/clean-code-javascript-ru/)
+    -   [maksugr/clean-code-javascript](https://github.com/maksugr/clean-code-javascript)
+-   ![vi](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Vietnam.png) **Vietnamese**: [hienvd/clean-code-javascript/](https://github.com/hienvd/clean-code-javascript/)
 
 **[⬆ 返回顶部](#代码整洁的-javascript)**
